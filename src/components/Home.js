@@ -1,16 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios'; // Import Axios
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true); // To handle loading state
+  const [error, setError] = useState(null); // To handle errors
 
   useEffect(() => {
-    const mockPosts = [
-      { id: 1, title: 'First Post', content: 'This is my first blog post!' },
-      { id: 2, title: 'Second Post', content: 'This is my second blog post!' },
-    ];
-    setPosts(mockPosts);
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get('https://jsonplaceholder.typicode.com/posts');
+        setPosts(response.data); // Set posts from API response
+      } catch (err) {
+        setError(err.message); // Set error if the request fails
+      } finally {
+        setLoading(false); // Update loading state
+      }
+    };
+
+    fetchPosts();
   }, []);
+
+  if (loading) return <div>Loading...</div>; // Loading state
+  if (error) return <div>Error: {error}</div>; // Error handling
 
   return (
     <div className="container">
